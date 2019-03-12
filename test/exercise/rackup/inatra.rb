@@ -3,7 +3,8 @@ module Inatra
     def routes
     end
 
-    def call(env)
+    def call(_env)
+      [200, {}, ['Hello World']]
     end
   end
 end
