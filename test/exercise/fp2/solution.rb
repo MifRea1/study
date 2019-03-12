@@ -13,20 +13,15 @@ module Exercise
 
       # Написать свою функцию my_map
       def my_map
-        result = MyArray.new
-        for e in self
-          result << (yield e)
-        end
-        result
+        my_reduce(MyArray.new) { |a, e| a << (yield e) }
       end
 
       # Написать свою функцию my_compact
       def my_compact
-        result = MyArray.new
-        for e in self
-          result << e unless e.nil?
+        my_reduce(MyArray.new) do |a, e|
+          a << e unless e.nil?
+          a
         end
-        result
       end
 
       # Написать свою функцию my_reduce
