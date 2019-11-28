@@ -1,25 +1,21 @@
 module Inatra
   class << self
     def routes(&block)
-      if block_given?
-        @routes = {}
-        class_exec(&block)
-      else
-        @routes
-      end
+      return @routes unless block_given?
+      @routes = Hash.new(Hash.new(-> { [405, {}, 'Method Not Allowed'] }))
+      class_exec(&block)
     end
 
     def call(env)
       method = env['REQUEST_METHOD'].downcase.to_sym
       path = env['PATH_INFO']
-      return [405, {}, 'Method Not Allowed'] unless routes.key?(method)
-      routes[method][path]&.call || [404, {}, 'Not Found']
+      routes[method][path].call
     end
 
-    def method_missing(name, *paths, &response)
+    def method_missing(method, *paths, &response)
       paths.each do |path|
-        routes[name] = {} unless routes.key?(name)
-        routes[name][path] = response
+        routes[method] = Hash.new(-> { [404, {}, 'Not Found'] }) unless routes.key?(method)
+        routes[method][path] = response
       end
     end
   end
